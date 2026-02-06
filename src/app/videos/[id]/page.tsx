@@ -50,7 +50,7 @@ export default function VideoDetailPage({
     try {
       const res = await fetch(`/api/videos/${id}`, { method: "DELETE" });
       if (res.ok) {
-        await mutate(null, false);
+        await mutate(undefined, false);
         toast.success("動画を削除しました");
         router.push("/");
       } else {

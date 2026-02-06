@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Comment } from "@prisma/client";
 
 // GET /api/videos/[id]/comments - List comments for a video
 export async function GET(
