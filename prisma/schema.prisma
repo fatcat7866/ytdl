@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id               String   @id @default(cuid())
+  youtubeId        String   @unique
+  url              String
+  title            String
+  description      String?
+  channelName      String?
+  channelId        String?
+  thumbnailUrl     String?
+  thumbnailS3Key   String?
+  duration         Int?
+  uploadDate       String?
+  viewCount        Int?
+
+  downloadStatus   String   @default("none") // none | pending | downloading | completed | failed
+  downloadProgress Float?
+  s3Key            String?
+  s3Bucket         String?
+  fileSize         Int?
+  fileMimeType     String?
+
+  rawMetadata      String?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tags             VideoTag[]
+  comments         Comment[]
+
+  @@index([title])
+  @@index([downloadStatus])
+  @@index([createdAt])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String?
+  createdAt DateTime @default(now())
+
+  videos    VideoTag[]
+
+  @@index([name])
+}
+
+model VideoTag {
+  id        String   @id @default(cuid())
+  videoId   String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  video     Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  tag       Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([videoId, tagId])
+  @@index([videoId])
+  @@index([tagId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  videoId   String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  video     Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@index([createdAt])
+}
